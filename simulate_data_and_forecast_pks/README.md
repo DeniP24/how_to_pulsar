@@ -1,7 +1,7 @@
-# Example PBDOT and OMDOT forecasting for PSR J1455-3330
+## Example PBDOT and OMDOT forecasting for PSR J1455-3330
 This is a step-by-step approach to simulating data with tempo2, and creating post keplerian parameter uncertainty predictions.
 
-## 1. Simulate data
+### 1. Simulate data
 Following the SKA book and Hu et al 2020 ([text](https://arxiv.org/pdf/2007.07725)), we will simulate data for different telescope phases as follows:
 
 | Telescope  | RMS  | Start MJD | End MJD  | Duration  | Cadence | 
@@ -14,15 +14,15 @@ Following the SKA book and Hu et al 2020 ([text](https://arxiv.org/pdf/2007.0772
     eg. ```awk '{print $0, "-i ska -fe ska"}' J1455-3330-.ska_try2 > J1455-3330-.ska_try2_2```
 - cat the original tim file, mkt, mkt+ and ska data with flags, remove extra mode and format fields
 
-## 2. Split concatenated tim file into `n` number of files, by adding `--increment` number of lines to the original base .tim file using `split.py`.
+### 2. Split concatenated tim file into `n` number of files, by adding `--increment` number of lines to the original base .tim file using `split.py`.
    - Input (-i): user specified .tim file
    - Start lines (-s): user specified number of lines in base .tim file (without simulated fake data) or default is taken as the first line "fake" occurs at minus 1 line
    - Output: {basename}_{no.of_lines}.tim
 
-## 3. Run tempo2 on each of these tim files and save the pk param value, error, mjd, chisq to a file called results.csv. This can be done in 2 ways:
+### 3. Run tempo2 on each of these tim files and save the pk param value, error, mjd, chisq to a file called results.csv. This can be done in 2 ways:
    - In parallel with tempo2_grep_slurm.sh
    - In a loop on the screen with tempo2_grep_loop.sh
 
-## 4. Run plot.py to create the plot with mjd vs fractional uncertainty. 
+### 4. Run plot.py to create the plot with mjd vs fractional uncertainty. 
 
-The above scripts can be run seperately, or just run `wrap.sh $input_file $start_lines $` 
+The above scripts can be run seperately with wrap.sh --mode (split,process,plot) or use --mode full to run all 3 scripts.

@@ -1,7 +1,18 @@
+#!/usr/bin/env python3
+import matplotlib
+matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import MaxNLocator
 from datetime import datetime, timedelta
+import argparse
+
+parser = argparse.ArgumentParser(description="Plot the pk parameter predictions.")
+parser.add_argument("--i", type=str, required=True, help="Input results csv from tempo2_grep_loop.sh with omdot, pbdot, errors, mjd and chisq")
+parser.add_argument("--o", type=str, help="Output filename")
+args = parser.parse_args() 
+input_file = args.i
+output_file = args.o
 
 omdot = []
 pbdot = []
@@ -11,8 +22,9 @@ omdot_err = []
 pbdot_err = []
 chisq_val =[]
 
-with open("output.txt", "r") as file:
-    for line in file:
+with open(input_file, "r") as file:
+    lines = file.readlines()[:-1] 
+    for line in lines:
         parts = line.split(',')
         omdot_val, omdot_err_val = map(float, parts[1].split())
         pbdot_val, pbdot_err_val = map(float, parts[2].split())
@@ -40,7 +52,7 @@ def mjd_to_decimal_year(mjd):
 
     return year + (day_of_year - 1) / days_in_year
 
-years_sorted = np.array([mjd_to_decimal_year(m) for m in mjd])
+years_sorted = np.sort(np.array([mjd_to_decimal_year(m) for m in mjd]))
 
 # Compute fractional errors
 fractional_error_pbdot = np.abs(pbdot_err / pbdot)
@@ -72,13 +84,10 @@ plt.text(2027, 4.5, 'SKA 1-mid', fontsize=9, color='black', rotation=90, ha='cen
 # Labels, legend, and title
 plt.xlabel('Time (Years)', fontsize=13)
 plt.yscale('log')
-plt.ylim(0,50)
+plt.ylim(1e-5,50)
 plt.tick_params(axis='both', labelsize=13)
 plt.legend(fontsize=13)
 plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
 plt.ylabel(r'Fractional Error ($\sigma^{-1}$)', fontsize=13) 
-plt.savefig('try2.pdf', format='pdf',dpi=300)
-
-# Show the plot
-plt.tight_layout()
-plt.show()
+plt.savefig(output_file, format='pdf',dpi=300)
+plt.close()
